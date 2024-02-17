@@ -1,0 +1,90 @@
+$comment: Database Requirements:
+$comment: Create a database named ToDoDB.
+
+use ToDoDB
+
+
+$comment: Design a collection named tasks.
+$comment: Each task should have information like title, description, status (e.g., "Pending," "Completed"), and due date.
+$comment: CRUD Operations:
+$comment: Create Operation:
+$comment: Insert at least 5 tasks with various titles, descriptions, statuses, and due dates.
+
+db.createCollection("tasks");
+db.tasks.insertMany([
+  {
+    title: "Task 1",
+    description: "Description for Task 1",
+    status: "Pending",
+    dueDate: ISODate("2024-02-28")
+  },
+  {
+    title: "Task 2",
+    description: "Description for Task 2",
+    status: "Completed",
+    dueDate: ISODate("2024-02-15")
+  },
+  {
+    title: "Task 3",
+    description: "Description for Task 3",
+    status: "Pending",
+    dueDate: ISODate("2024-03-10")
+  },
+  {
+    title: "Task 4",
+    description: "Description for Task 4",
+    status: "Pending",
+    dueDate: ISODate("2024-02-20")
+  },
+  {
+    title: "Task 5",
+    description: "Description for Task 5",
+    status: "Completed",
+    dueDate: ISODate("2024-02-18")
+  }
+]);
+
+
+$comment: Read Operation:
+$comment: Retrieve and display all tasks in the database.
+db.tasks.find({});
+
+$comment: Display the details of a specific task by searching with its title or status.
+db.tasks.find({ title: "Task 1" });
+db.tasks.find({ status: "Completed" });
+
+
+$comment: List all tasks that are pending or completed.
+db.tasks.find({ status: "Pending" });
+db.tasks.find({ status: "Completed" });
+
+$comment: List of all task which is still pending after due date.
+db.tasks.find({ status: "Pending", dueDate: { $lt: new Date() }});
+
+$comment: Show all task in pending key and completed key {pending: [task....], completed: [task...]}
+printjson({
+  pending: db.tasks.find({ status: "Pending" }).toArray(),
+  completed: db.tasks.find({ status: "Completed" }).toArray()
+});
+
+
+$comment: Update Operation:
+$comment: Update the status of a specific task (e.g., from "Pending" to "Completed").
+db.tasks.updateOne({ title: "Task 1" }, { $set: { status: "Completed" }});
+
+$comment: Update the due date of a task.
+db.tasks.updateOne({ title: "Task 3" }, { $set: { dueDate: ISODate("2024-03-15") }});
+
+$comment: Update all pending task which due date is less than 2 days from today.
+db.tasks.updateMany({ status: "Pending", dueDate: { $lt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) } }, { $set: { status: "UpdatedPending" }});
+
+$comment: Delete Operation:
+$comment: Remove a task by its title or status.
+db.tasks.deleteOne({ title: "Task 2" });
+
+$comment: Delete all completed tasks.
+db.tasks.deleteMany({ status: "Completed"});
+
+
+
+
